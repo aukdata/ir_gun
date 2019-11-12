@@ -6,6 +6,7 @@
 
 #include <avr/io.h>
 #include "port.hpp"
+#include "lcd.hpp"
 
 int main()
 {
