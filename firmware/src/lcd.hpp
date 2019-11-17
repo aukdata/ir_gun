@@ -1,12 +1,20 @@
 #ifndef LCD_HPP
 #define LCD_HPP
 
+#include <util/delay.h>
+#include <math.h>
+
 #include "port.hpp"
+#include "utils.hpp"
 
 namespace gb7
 {
-    template<PinReadable RS_Pin, PinReadable RW_Pin, PortReadable DataBus_Port,
-        PinReadable CS1_Pin, PinReadable CS2_Pin, PinReadable E_Pin>
+    /*
+    template<PinWritable RS_Pin, PinWritable RW_Pin, PortWritable DataBus_Port,
+        PinWritable CS1_Pin, PinWritable CS2_Pin, PinWritable E_Pin>
+        */
+    template<class RS_Pin, class RW_Pin, class DataBus_Port,
+        class CS1_Pin, class CS2_Pin, class E_Pin, class Reset_Pin>
     class lcd
     {
     private:
@@ -15,55 +23,106 @@ namespace gb7
         DataBus_Port m_data_bus;
         CS1_Pin m_cs1;
         CS2_Pin m_cs2;
+        E_Pin m_e;
+        Reset_Pin m_reset;
 
         bool dirty[16][8] = { false };
         uint8_t buffer[2][8][64] = { 0 };
-    
+
+
+        inline void send_command(bool rs, bool rw, uint8_t data) noexcept
+        {
+            m_data_bus.write(data);
+            m_rs = rs;
+            m_rw = rw;
+            m_e = true;
+            _delay_us(5);
+
+            m_e = false;
+            _delay_us(5);
+        }
+
+        inline void set_on(bool d) noexcept
+        {
+            send_command(false, false, 0b00111110 | (d ? 1 : 0));
+        }
+        inline void set_column(uint8_t addr) noexcept
+        {
+            send_command(false, false, 0b01000000 | addr);
+        }
+        inline void set_page(uint8_t page) noexcept
+        {
+            send_command(false, false, 0b10111000 | page);
+        }
+        inline void set_start_line(uint8_t s) noexcept
+        {
+            send_command(false, false, 0b11000000 | s);
+        }
+        inline void set_data(uint8_t data) noexcept
+        {
+            send_command(true, false, data);
+        }
+        inline void set_chip(uint8_t c) noexcept
+        {
+            m_cs1 = c == 0;
+            m_cs2 = c == 1;
+            _delay_us(0.14);
+        }
+
     public:
         lcd() noexcept = default;
         ~lcd() = default;
 
-        void init()
+        void init() noexcept
         {
+            m_cs1 = true;
+            m_cs2 = true;
+            m_reset = true;
+            _delay_ms(30);
 
+            set_on(false);
+
+            set_page(0);
+            set_column(0);
+            set_start_line(0);
+
+            clear();
+
+            set_on(true);
         }
 
-        void set_chip(bool first)
+        void clear()
         {
-            m_cs1 = first;
-            m_cs2 = !first;
-        }
+            m_cs1 = true;
+            m_cs2 = true;
 
-        void set_page(uint8_t chip)
-        {
-            m_data_bus.write(0b10111000 | chip);
-            m_rs = false;
-            m_rw = false;
-        }
-
-        void set_column(uint8_t addr)
-        {
-            m_data_bus.write(0b01000000 | addr);
-            m_rs = false;
-            m_rw = false;
-        }
-
-        void set_data(uint8_t data)
-        {
-            m_data_bus.write(data);
-            m_rs = true;
-            m_rw = false;
-        }
-
-        void set_pixel(uint8_t x, uint8_t y, bool value)
-        {
-            if ((x & 0b10000000) != 0 && (y & 0b11000000) != 0) // x < 128 && y < 64
+            for (uint8_t chunk_y = 0; chunk_y < 8; chunk_y++)
             {
-                const uint8_t mask = (value ? 1 : 0) << (y % 8);
-                const uint8_t chip = x < 64 ? 0 : 1;
-                const uint8_t page = y >> 3;
+                set_page(chunk_y);
+                for (uint8_t chunk_x = 0; chunk_x < 8; chunk_x++)
+                {
+                    dirty[0 + chunk_x][chunk_y] = false;
+                    dirty[8 + chunk_x][chunk_y] = false;
+                    for (uint8_t i = 0; i < 8; i++)
+                    {
+                        const uint8_t column = chunk_x * 8 + i;
+                        buffer[0][chunk_y][column] = 0;
+                        buffer[1][chunk_y][column] = 0;
+                        set_data(0);
+                    }
+                }
+            }
+        }
+
+        void set_pixel(uint8_t x, uint8_t y, bool value) noexcept
+        {
+            if (x < 128 && y < 64)
+            {
+                const uint8_t chip = x / 64;
+                const uint8_t page = y / 8;
                 const uint8_t column = x % 64;
-                if ((buffer[chip][page][column] & mask) ^ mask != 0)
+                const uint8_t mask = value ? 1 << (y % 8) : 0;
+                if (((buffer[chip][page][column] & mask) ^ mask) != 0)
                 {
                     if (value)
                     {
@@ -73,33 +132,83 @@ namespace gb7
                     {
                         buffer[chip][page][column] &= ~mask;
                     }
-                    dirty[x >> 3][y >> 3] = true;
+                    dirty[x / 8][page] = true;
                 }
             }
         }
 
-        void update()
+        bool get_pixel(uint8_t x, uint8_t y) const noexcept
         {
-            for (int x = 0; x < 16; x++)
+            if (x < 128 && y < 64)
             {
-                for (int y = 0; y < 8; y++)
+                const uint8_t chip = x / 64;
+                const uint8_t page = y / 8;
+                const uint8_t column = x % 64;
+                const uint8_t mask = 1 << (y % 8);
+                return (buffer[chip][page][column] & mask) != 0;
+            }
+            return false;
+        }
+
+        void draw_line(uint8_t x, uint8_t y, uint8_t to_x, uint8_t to_y) noexcept
+        {
+            const uint8_t x_start = min(x, to_x);
+            const uint8_t x_end = max(x, to_x);
+            const uint8_t y_start = min(y, to_y);
+            const uint8_t y_end = max(y, to_y);
+
+            const uint16_t width = x_end - x_start;
+            const uint16_t height = y_end - y_start;
+
+            if (width > height)
+            {
+                for (uint16_t i = 0; i < width; i++)
                 {
-                    if (dirty[x][y])
+                    set_pixel(x_start + i, y_start + i * height / width, true);
+                }
+            }
+            else
+            {
+                for (uint16_t i = 0; i < height; i++)
+                {
+                    set_pixel(x_start + i * width / height, y_start + i, true);
+                }
+            }
+        }
+
+        void update() noexcept
+        {
+            for (uint8_t chip = 0; chip < 2; chip++)
+            {
+                set_chip(chip);
+                for (uint8_t chunk_y = 0; chunk_y < 8; chunk_y++)
+                {
+                    set_page(chunk_y);
+                    for (uint8_t chunk_x = 0; chunk_x < 8; chunk_x++)
                     {
-                        const bool left_chip = x < 8;
-                        set_chip(left_chip);
-                        set_page(y);
-                        for (uint8_t i = 0; i < 8; i++)
+                        if (dirty[chip * 8 + chunk_x][chunk_y])
                         {
-                            const uint8_t column = (x << 3) | i;
-                            set_column(column);
-                            set_data(buffer[left_chip ? 0 : 1][y][column]);
+                            for (uint8_t i = 0; i < 8; i++)
+                            {
+                                const uint8_t column = chunk_x * 8 + i;
+                                set_column(column);
+                                set_data(buffer[chip][chunk_y][column]);
+                            }
+                            dirty[chip * 8 + chunk_x][chunk_y] = false;
                         }
                     }
                 }
             }
         }
-    };        
+        
+        void set_pixel_immediataly(int x, int y) noexcept
+        {
+            set_chip(x / 64);
+            set_page(y / 8);
+            set_column(x % 64);
+            set_data(1 << (y % 8));
+        }
+    };
 }
 
 #endif // LCD_HPP
