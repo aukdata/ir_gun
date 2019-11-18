@@ -45,6 +45,24 @@ int main()
             graphic.draw_ascii_char(0, 0, j);
             graphic.draw_ascii_string(1, 0, ascii_str);
 
+            static constexpr uint64_t str[] = {
+                0x7f017555750180,
+                0x3f4041402111,
+                0x7f251f6a706f0b,
+                0x403f1b775b771c,
+                0x7f002052424241,
+                0x304a7f2a1a4a31,
+                0x10295557654539,
+                0x445453d050406,
+                0x10100878040201,
+                0x7f4020201009,
+                0x844432222120f,
+                0x7f08081011,
+                0xf4040201f01,
+                0x0
+            }; /* 同じ階層にあるディレクトリ */
+            graphic.draw_jis_string(3, 0, str);
+
             graphic.update();
             _delay_ms(500);
         }

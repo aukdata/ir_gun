@@ -196,6 +196,26 @@ namespace gb7
             }
         }
 
+        inline void draw_jis_char(uint8_t line, uint8_t column, uint64_t c) noexcept
+        {
+            if (line > 8 || column > 16) return;
+            c--;
+
+            for (uint8_t i = 0; i < 7; i++)
+            {
+                buffer[column / 8][line][(column % 8) * 8 + i] = (c >> 8 * (6 - i)) & 0xff;
+            }
+            dirty[column][line] = true;
+        }
+
+        inline void draw_jis_string(uint8_t line, uint8_t column, const uint64_t* str) noexcept
+        {
+            for (uint8_t i = 0; str[i] != 0 && (column + i) < 16; i++)
+            {
+                draw_jis_char(line, column + i, str[i]);
+            }
+        }
+
         inline void update() noexcept
         {
             for (uint8_t chip = 0; chip < 2; chip++)
