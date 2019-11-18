@@ -177,7 +177,7 @@ namespace gb7
             }
         }
 
-        inline void draw_char(uint8_t line, uint8_t column, uint8_t c) noexcept
+        inline void draw_ascii_char(uint8_t line, uint8_t column, uint8_t c) noexcept
         {
             if (line > 8 || column > 32) return;
 
@@ -188,11 +188,11 @@ namespace gb7
             dirty[column][line] = true;
         }
 
-        inline void draw_string(uint8_t line, uint8_t column, const uint8_t* s) noexcept
+        inline void draw_ascii_string(uint8_t line, uint8_t column, const uint8_t* s) noexcept
         {
             for (uint8_t i = 0; s[i] != 0x0000 && (column + i) < 32; i++)
             {
-                draw_char(line, column + i, s[i]);
+                draw_ascii_char(line, column + i, s[i]);
             }
         }
 

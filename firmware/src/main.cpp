@@ -41,10 +41,9 @@ int main()
 
         for (uint8_t j = 0; j< 158; j++)
         {
-            constexpr uint8_t str[] = { 0x77, 0x72, 0x6a, 0x6f, 0x81, 0x00 }; /* ｸｳｫｰﾂ */
-
-            graphic.draw_char(0, 0, j);
-            graphic.draw_string(1, 0, str);
+            static constexpr uint8_t ascii_str[] = { 0x77, 0x72, 0x6a, 0x6f, 0x81, 0x00 }; /* ｸｳｫｰﾂ */
+            graphic.draw_ascii_char(0, 0, j);
+            graphic.draw_ascii_string(1, 0, ascii_str);
 
             graphic.update();
             _delay_ms(500);
