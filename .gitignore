@@ -2,5 +2,6 @@
 *.elf
 *.hex
 *.s
+*.pyc
 .DS_Store
 build
