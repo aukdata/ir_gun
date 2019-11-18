@@ -6,6 +6,7 @@
 
 #include "port.hpp"
 #include "utils.hpp"
+#include "../font/misaki_font.hpp"
 
 namespace gb7
 {
@@ -173,6 +174,25 @@ namespace gb7
                 {
                     set_pixel(x_start + i * width / height, y_start + i, true);
                 }
+            }
+        }
+
+        inline void draw_char(uint8_t line, uint8_t column, uint8_t c)
+        {
+            if (line > 8 || column > 32) return;
+
+            for (uint8_t i = 0; i < 3; i++)
+            {
+                buffer[column / 16][line][(column % 16) * 4 + i] = gb7::font::misaki_font_former[c][i];
+            }
+            dirty[column][line] = true;
+        }
+
+        inline void draw_string(uint8_t line, uint8_t column, const uint8_t* s)
+        {
+            for (uint8_t i = 0; s[i] != 0x0000 && (column + i) < 32; i++)
+            {
+                draw_char(line, column + i, s[i]);
             }
         }
 

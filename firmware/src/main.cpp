@@ -39,11 +39,15 @@ int main()
 
         graphic.clear();
 
-        for (uint16_t j = 0; j < 128; j++)
+        for (uint8_t j = 0; j< 158; j++)
         {
-            graphic.draw_line(rand() % 128, rand() % 64, rand() % 128, rand() % 64);
+            constexpr uint8_t str[] = { 0x77, 0x72, 0x6a, 0x6f, 0x81, 0x00 }; /* ｸｳｫｰﾂ */
+
+            graphic.draw_char(0, 0, j);
+            graphic.draw_string(1, 0, str);
+
             graphic.update();
-            _delay_ms(100);
+            _delay_ms(500);
         }
 
         _delay_ms(1000);
