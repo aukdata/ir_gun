@@ -185,7 +185,7 @@ namespace gb7
             {
                 buffer[column / 16][line][(column % 16) * 4 + i] = gb7::font::misaki_font_former[c][i];
             }
-            dirty[column][line] = true;
+            dirty[column / 2][line] = true;
         }
 
         inline void draw_ascii_string(uint8_t line, uint8_t column, const uint8_t* s) noexcept
