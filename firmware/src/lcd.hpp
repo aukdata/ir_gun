@@ -74,7 +74,7 @@ namespace gb7
         lcd() noexcept = default;
         ~lcd() = default;
 
-        void init() noexcept
+        inline void init() noexcept
         {
             m_cs1 = true;
             m_cs2 = true;
@@ -92,7 +92,7 @@ namespace gb7
             set_on(true);
         }
 
-        void clear()
+        inline void clear()
         {
             m_cs1 = true;
             m_cs2 = true;
@@ -115,7 +115,7 @@ namespace gb7
             }
         }
 
-        void set_pixel(uint8_t x, uint8_t y, bool value) noexcept
+        inline void set_pixel(uint8_t x, uint8_t y, bool value) noexcept
         {
             if (x < 128 && y < 64)
             {
@@ -138,7 +138,7 @@ namespace gb7
             }
         }
 
-        bool get_pixel(uint8_t x, uint8_t y) const noexcept
+        inline bool get_pixel(uint8_t x, uint8_t y) const noexcept
         {
             if (x < 128 && y < 64)
             {
@@ -151,7 +151,7 @@ namespace gb7
             return false;
         }
 
-        void draw_line(uint8_t x, uint8_t y, uint8_t to_x, uint8_t to_y) noexcept
+        inline void draw_line(uint8_t x, uint8_t y, uint8_t to_x, uint8_t to_y) noexcept
         {
             const uint8_t x_start = min(x, to_x);
             const uint8_t x_end = max(x, to_x);
@@ -177,7 +177,7 @@ namespace gb7
             }
         }
 
-        inline void draw_char(uint8_t line, uint8_t column, uint8_t c)
+        inline void draw_char(uint8_t line, uint8_t column, uint8_t c) noexcept
         {
             if (line > 8 || column > 32) return;
 
@@ -188,7 +188,7 @@ namespace gb7
             dirty[column][line] = true;
         }
 
-        inline void draw_string(uint8_t line, uint8_t column, const uint8_t* s)
+        inline void draw_string(uint8_t line, uint8_t column, const uint8_t* s) noexcept
         {
             for (uint8_t i = 0; s[i] != 0x0000 && (column + i) < 32; i++)
             {
@@ -196,7 +196,7 @@ namespace gb7
             }
         }
 
-        void update() noexcept
+        inline void update() noexcept
         {
             for (uint8_t chip = 0; chip < 2; chip++)
             {
@@ -221,7 +221,7 @@ namespace gb7
             }
         }
         
-        void set_pixel_immediataly(int x, int y) noexcept
+        inline void set_pixel_immediataly(int x, int y) noexcept
         {
             set_chip(x / 64);
             set_page(y / 8);
