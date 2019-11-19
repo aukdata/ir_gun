@@ -84,16 +84,12 @@ namespace gb7
 
             set_on(false);
 
-            set_page(0);
-            set_column(0);
-            set_start_line(0);
-
-            clear();
+            clear_immediataly();
 
             set_on(true);
         }
 
-        inline void clear()
+        inline void clear_immediataly()
         {
             m_cs1 = true;
             m_cs2 = true;
@@ -112,6 +108,36 @@ namespace gb7
                         buffer[1][chunk_y][column] = 0;
                         set_data(0);
                     }
+                }
+            }
+        }
+
+        inline void clear()
+        {
+            for (uint8_t chunk_y = 0; chunk_y < 8; chunk_y++)
+            {
+                for (uint8_t chunk_x = 0; chunk_x < 8; chunk_x++)
+                {
+                    bool is_left_empty = true;
+                    bool is_right_empty = true;
+                    for (uint8_t i = 0; i < 8; i++)
+                    {
+                        const uint8_t column = chunk_x * 8 + i;
+                        if (buffer[0][chunk_y][column] != 0)
+                        {
+                            buffer[0][chunk_y][column] = 0;
+                            is_left_empty = false;
+                        }
+                        if (buffer[1][chunk_y][column] != 0)
+                        {
+                            buffer[1][chunk_y][column] = 0;
+                            is_right_empty = false;
+                        }
+                    }
+                    if (!is_left_empty)
+                        dirty[0 + chunk_x][chunk_y] = true;
+                    if (!is_right_empty)
+                        dirty[8 + chunk_x][chunk_y] = true;
                 }
             }
         }
