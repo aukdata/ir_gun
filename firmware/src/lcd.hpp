@@ -177,18 +177,25 @@ namespace gb7
             }
         }
 
-        inline void draw_ascii_char(uint8_t line, uint8_t column, uint8_t c) noexcept
+        inline void draw_ascii_char(uint8_t line, uint8_t column, char c) noexcept
         {
             if (line > 8 || column > 32) return;
 
+            uint8_t index;
+            if (static_cast<char>(32) < c && c <= static_cast<char>(127))
+                index = static_cast<int>(c) - 32;
+            else if (static_cast<char>(161) < c && c <= static_cast<char>(224))
+                index = static_cast<int>(c) - 161 + 96;
+            else return;
+
             for (uint8_t i = 0; i < 3; i++)
             {
-                buffer[column / 16][line][(column % 16) * 4 + i] = gb7::font::misaki_font_former[c][i];
+                buffer[column / 16][line][(column % 16) * 4 + i] = gb7::font::misaki_font_former[index][i];
             }
             dirty[column / 2][line] = true;
         }
 
-        inline void draw_ascii_string(uint8_t line, uint8_t column, const uint8_t* s) noexcept
+        inline void draw_ascii_string(uint8_t line, uint8_t column, const char* s) noexcept
         {
             for (uint8_t i = 0; s[i] != 0x0000 && (column + i) < 32; i++)
             {
