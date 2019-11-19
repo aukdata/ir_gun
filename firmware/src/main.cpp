@@ -37,36 +37,54 @@ int main()
     {
         pin_b0 = !pin_b0;
 
-        graphic.clear();
-
-        for (uint8_t j = 0; j< 158; j++)
+        for (uint8_t j = 0; j < 7; j++)
         {
-            graphic.draw_ascii_char(0, 0, j);
-            graphic.draw_ascii_string(1, 0, "Quartz");
+            graphic.clear();
+            graphic.draw_ascii_string(0, 5, "\xcf\xb2\xba\xdd Atmega328P\n with TG12864B-02WWBV");
 
             static constexpr uint64_t str[] = {
-                0x7f017555750180,
-                0x3f4041402111,
-                0x7f251f6a706f0b,
-                0x403f1b775b771c,
-                0x7f002052424241,
-                0x304a7f2a1a4a31,
-                0x10295557654539,
-                0x445453d050406,
-                0x10100878040201,
-                0x7f4020201009,
-                0x844432222120f,
+                0x5257563e565753,
+                0x1e125e553c5555,
+                0x242422222120f,
+                0x242414547e0401,
+                0x1414220201009,
                 0x7f08081011,
-                0xf4040201f01,
                 0x0
-            }; /* 同じ階層にあるディレクトリ */
-            graphic.draw_jis_string(3, 0, str);
+            }; /* 美咲フォント */
+            static constexpr uint64_t iroha[] = {
+                0x23e555d575c61,
+                0x7f2052527f2243,
+                0x8043f2a2a427f,
+                0x4425151d754541,
+                0x20504f48454442,
+                0xa7f2a7f5c235f,
+                0xf4241211e01,
+                0x38473c122f527d,
+                0x10295557654539,
+                0x120a6e5b724a49,
+                0x0
+            }; /* 色は匂えど散りぬるを */
+            static constexpr uint64_t wagayo[] = {
+                0x14567e155f2456,
+                0x621a47423d000e,
+                0x47f445f545f45,
+                0x6a6b047f4a7f4b,
+                0x8092d5b49480a,
+                0x36131e7b1e1337,
+                0x320a2752507e23,
+                0x181549494a2811,
+                0x322a7f42404233,
+                0x0
+            }; /* 我が世誰ぞ常ならむ */
+
+            graphic.draw_jis_string(3, j + 2, str);
+            graphic.draw_jis_string(5, 1, i % 2 == 0 ? iroha : wagayo);
+
+            graphic.printf(7, 1, "iteration: %d", i);
 
             graphic.update();
             _delay_ms(500);
         }
-
-        _delay_ms(1000);
     }
 
     return 0;   /* never reached */
