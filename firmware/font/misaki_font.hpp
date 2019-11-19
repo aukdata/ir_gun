@@ -5,7 +5,6 @@
 
 namespace gb7::font
 {
-    static constexpr uint8_t test[30] = { 0 };
     static constexpr uint8_t misaki_font_former[][3] =
     {
                                      // ascii code: symbol
