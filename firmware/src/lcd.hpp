@@ -3,6 +3,7 @@
 
 #include <util/delay.h>
 #include <math.h>
+#include <stdio.h>
 
 #include "port.hpp"
 #include "utils.hpp"
@@ -197,9 +198,21 @@ namespace gb7
 
         inline void draw_ascii_string(uint8_t line, uint8_t column, const char* s) noexcept
         {
-            for (uint8_t i = 0; s[i] != 0x0000 && (column + i) < 32; i++)
+            uint8_t temp_column = column;
+
+            for (uint8_t i = 0; s[i] != 0x0000; i++)
             {
-                draw_ascii_char(line, column + i, s[i]);
+                if (s[i] == '\n')
+                {
+                    temp_column = column;
+                    line++;
+                }
+                else if (temp_column < 32)
+                {
+                    
+                    draw_ascii_char(line, temp_column, s[i]);
+                    temp_column++;
+                }
             }
         }
 
@@ -221,6 +234,14 @@ namespace gb7
             {
                 draw_jis_char(line, column + i, str[i]);
             }
+        }
+
+        template<typename... Args>
+        inline void printf(uint8_t line, uint8_t column, const char* format, Args... args)
+        {
+            char buf[33];
+            snprintf(buf, 33, format, args...);
+            draw_ascii_string(line, column, buf);
         }
 
         inline void update() noexcept
