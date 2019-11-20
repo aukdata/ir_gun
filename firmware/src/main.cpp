@@ -7,7 +7,7 @@
 #include <avr/io.h>
 #include <stdlib.h>
 #include "port.hpp"
-#include "lcd.hpp"
+#include "lcd_drawable.hpp"
 
 int main()
 {
@@ -27,9 +27,8 @@ int main()
     auto e = port_c.get_writable_pin<4>();
     auto reset = port_c.get_writable_pin<5>();
 
-    gb7::lcd<decltype(rs), decltype(rw), gb7::port_dyamic<gb7::port_type::PortD>,
+    gb7::lcd_drawable<decltype(rs), decltype(rw), gb7::port_dyamic<gb7::port_type::PortD>,
         decltype(cs1), decltype(cs2), decltype(e), decltype(reset)> graphic{};
-    graphic.init();
 
     gb7::port_writable<gb7::port_type::PortB> port_b;
     auto pin_b0 = port_b.get_writable_pin<0>();
