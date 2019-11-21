@@ -27,11 +27,7 @@ FUSES      = -U lfuse:w:0xc2:m -U hfuse:w:0xd9:m -U efuse:w:0xff:m
 # DEVICE     = atmega168p
 # CLOCK      = 8000000
 # PROGRAMMER = -c stk500 -P /dev/tty.usbserial-1420
-# OBJECTS    = build/main.o
 # FUSES      = -U lfuse:w:0x42:m -U hfuse:w:0xdf:m -U efuse:w:0xf9:m
-
-# ATMega8 fuse bits used above (fuse bits for other devices are different!):
-# Example for 8 MHz internal oscillator
 # Fuse high byte:
 # 0xd9 = 1 1 0 1   1 0 0 1 <-- BOOTRST (boot reset vector at 0x0000)
 #        ^ ^ ^ ^   ^ ^ ^------ BOOTSZ0
