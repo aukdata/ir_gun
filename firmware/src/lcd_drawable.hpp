@@ -173,7 +173,7 @@ namespace gb7
             }
         }
 
-        inline void draw_jis_char(uint8_t line, uint8_t column, uint64_t c) noexcept
+        inline void draw_zenkaku_char(uint8_t line, uint8_t column, uint64_t c) noexcept
         {
             if (line > 8 || column > 16) return;
             c--;
@@ -185,11 +185,11 @@ namespace gb7
             dirty[column][line] = true;
         }
 
-        inline void draw_jis_string(uint8_t line, uint8_t column, const uint64_t* str) noexcept
+        inline void draw_zenkaku_string(uint8_t line, uint8_t column, const uint64_t* str) noexcept
         {
             for (uint8_t i = 0; str[i] != 0 && (column + i) < 16; i++)
             {
-                draw_jis_char(line, column + i, str[i]);
+                draw_zenkaku_char(line, column + i, str[i]);
             }
         }
 

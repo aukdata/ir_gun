@@ -76,8 +76,8 @@ int main()
                 0x0
             }; /* 我が世誰ぞ常ならむ */
 
-            graphic.draw_jis_string(3, j + 2, str);
-            graphic.draw_jis_string(5, 1, i % 2 == 0 ? iroha : wagayo);
+            graphic.draw_zenkaku_string(3, j + 2, str);
+            graphic.draw_zenkaku_string(5, 1, i % 2 == 0 ? iroha : wagayo);
 
             graphic.printf(7, 1, "iteration: %d", i);
 
