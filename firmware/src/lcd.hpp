@@ -16,7 +16,7 @@ namespace gb7
         PinWritable CS1_Pin, PinWritable CS2_Pin, PinWritable E_Pin>
         */
     template<class RS_Pin, class RW_Pin, class DataBus_Port,
-        class CS1_Pin, class CS2_Pin, class E_Pin, class Reset_Pin>
+        class CS1_Pin, class CS2_Pin, class E_Pin, class RST_Pin>
     class lcd
     {
     private:
@@ -26,7 +26,7 @@ namespace gb7
         CS1_Pin m_cs1;
         CS2_Pin m_cs2;
         E_Pin m_e;
-        Reset_Pin m_reset;
+        RST_Pin m_rst;
 
     public:
         lcd() noexcept = default;
@@ -75,7 +75,7 @@ namespace gb7
         {
             m_cs1 = true;
             m_cs2 = true;
-            m_reset = true;
+            m_rst = true;
             _delay_ms(30);
 
             set_on(false);
