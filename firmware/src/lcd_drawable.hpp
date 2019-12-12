@@ -19,7 +19,6 @@ namespace gb7
         {
             graphical_lcd.init();
         }
-        ~lcd_drawable() = default;
 
         inline void clear_immediataly() noexcept
         {

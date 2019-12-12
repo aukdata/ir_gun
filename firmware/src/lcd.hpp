@@ -29,9 +29,6 @@ namespace gb7
         RST_Pin m_rst;
 
     public:
-        lcd() noexcept = default;
-        ~lcd() = default;
-
         inline void send_command(bool rs, bool rw, uint8_t data) noexcept
         {
             m_data_bus.write(data);
