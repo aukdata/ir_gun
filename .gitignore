@@ -3,5 +3,6 @@
 *.hex
 *.s
 *.pyc
-.DS_Store
+*.xcodeproj
+.*
 build
