@@ -11,12 +11,13 @@
 
 namespace gb7
 {
-    /*
+#if defined __cpp_concepts && __cpp_concepts >= 201907
     template<PinWritable RS_Pin, PinWritable RW_Pin, PortWritable DataBus_Port,
-        PinWritable CS1_Pin, PinWritable CS2_Pin, PinWritable E_Pin>
-        */
+        PinWritable CS1_Pin, PinWritable CS2_Pin, PinWritable E_Pin, Pinritable RST_Pin>
+#else
     template<class RS_Pin, class RW_Pin, class DataBus_Port,
         class CS1_Pin, class CS2_Pin, class E_Pin, class RST_Pin>
+#endif
     class lcd
     {
     private:
