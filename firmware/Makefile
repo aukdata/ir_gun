@@ -21,8 +21,14 @@
 DEVICE     = atmega328p
 CLOCK      = 8000000
 PROGRAMMER = -c avrisp -P /dev/tty.usbserial-AH01KQD3 -b 19200
-OBJECTS    = build/main.o build/shift_register.o build/utils.o
-FUSES      = -U lfuse:w:0x62:m -U hfuse:w:0xd9:m -U efuse:w:0xff:m
+OBJECTS    = build/main.o
+FUSES      = -U lfuse:w:0xc2:m -U hfuse:w:0xd9:m -U efuse:w:0xff:m
+
+# DEVICE     = atmega168p
+# CLOCK      = 8000000
+# PROGRAMMER = -c stk500 -P /dev/tty.usbserial-1420
+# OBJECTS    = build/main.o
+# FUSES      = -U lfuse:w:0x42:m -U hfuse:w:0xdf:m -U efuse:w:0xf9:m
 
 # ATMega8 fuse bits used above (fuse bits for other devices are different!):
 # Example for 8 MHz internal oscillator
