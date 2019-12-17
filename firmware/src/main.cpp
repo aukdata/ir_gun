@@ -41,16 +41,13 @@ int main()
         auto photo_sensor = port_b.get_readable_pin<0>();
         auto led = port_b.get_writable_pin<1>();
 
+        gb7::timer::timer0::init();
 
         using namespace gb7::timer::literals;
-        gb7::timer::multi_timer::evoke_every<10_ms>(+[](void*) {
-            decltype(photo_sensor) photo_sensor;
-            static gb7::queue<bool> buffer;
-
-            if (photo_sensor)
-            {
-                
-            }
+        gb7::timer::timer0::evoke_every<1000_ms>(+[](void*) {
+            decltype(led) led;
+            
+            led = !led;
         }, nullptr);
     }
 
