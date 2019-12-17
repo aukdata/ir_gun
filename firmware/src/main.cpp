@@ -35,9 +35,11 @@ int main()
         static constexpr gb7::pin_io_config config[8] = 
         {
             gb7::pin_io_config::readable,
+            gb7::pin_io_config::writable,
         };
         gb7::port_mixed<gb7::port_type::PortB, config> port_b;
         auto photo_sensor = port_b.get_readable_pin<0>();
+        auto led = port_b.get_writable_pin<1>();
 
 
         using namespace gb7::timer::literals;
