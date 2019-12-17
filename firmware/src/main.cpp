@@ -31,7 +31,6 @@ int main()
         graphic.update();
     }
 
-    for(int i=0;;i++)
     {
         static constexpr gb7::pin_io_config config[8] = 
         {
@@ -53,5 +52,6 @@ int main()
         }, nullptr);
     }
 
+    for (;;); // infinity loop
     return 0;   /* never reached */
 }
