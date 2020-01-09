@@ -7,7 +7,7 @@
 #include <avr/io.h>
 #include <stdlib.h>
 
-#define GB7_TIMER_USE_EVOKE
+#define GB7_TIMER_USE_INVOKE
 
 #include "queue.hpp"
 #include "timer.hpp"
@@ -72,7 +72,7 @@ int main()
         gb7::timer::timer0::init();
 
         using namespace gb7::timer::literals;
-        gb7::timer::timer0::evoke_every(1000_ms, +[](void*) {
+        gb7::timer::timer0::invoke_every(1000_ms, +[](void*) {
             decltype(led) led;
             
             led = !led;
