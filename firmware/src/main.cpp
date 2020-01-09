@@ -58,7 +58,8 @@ int main()
         graphic.update();
     }
 
-    {
+    /*
+    if (false) {
         static constexpr gb7::pin_io_config config[8] = 
         {
             gb7::pin_io_config::readable,
@@ -77,6 +78,7 @@ int main()
             led = !led;
         });
     }
+    */
 
     for (;;); // infinity loop
     return 0;   /* never reached */
