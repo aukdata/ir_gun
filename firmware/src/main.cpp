@@ -18,13 +18,38 @@
 int main()
 {
     {
-        gb7::port_writable<gb7::port_type::PortD> port_d;
-        auto cs1 = port_d.get_writable_pin<0>();
-        auto cs2 = port_d.get_writable_pin<1>();
-        auto rs = port_d.get_writable_pin<2>();
-        auto rw = port_d.get_writable_pin<3>();
-        auto e = port_d.get_writable_pin<4>();
-        auto rst = port_d.get_writable_pin<5>();
+        static constexpr gb7::pin_io_config port_b_config[8] = 
+        {
+            gb7::pin_io_config::writable,
+            gb7::pin_io_config::writable,
+            gb7::pin_io_config::writable,
+            gb7::pin_io_config::writable,
+
+            gb7::pin_io_config::writable,
+            gb7::pin_io_config::writable,
+            gb7::pin_io_config::writable,
+            gb7::pin_io_config::writable,
+        };
+        static constexpr gb7::pin_io_config port_c_config[8] = 
+        {
+            gb7::pin_io_config::writable,
+            gb7::pin_io_config::writable,
+            gb7::pin_io_config::readable,
+            gb7::pin_io_config::writable,
+
+            gb7::pin_io_config::writable,
+            gb7::pin_io_config::writable,
+            gb7::pin_io_config::writable,
+            gb7::pin_io_config::writable,
+        };
+        gb7::port_mixed<gb7::port_type::PortB, port_b_config> port_b;
+        gb7::port_mixed<gb7::port_type::PortC, port_c_config> port_c;
+        auto cs1 = port_b.get_writable_pin<0>();
+        auto cs2 = port_b.get_writable_pin<1>();
+        auto rst = port_b.get_writable_pin<2>();
+        auto rw  = port_b.get_writable_pin<6>();
+        auto e   = port_b.get_writable_pin<7>();
+        auto rs  = port_c.get_writable_pin<5>();
 
         gb7::lcd_drawable<decltype(rs), decltype(rw), gb7::port_dyamic<gb7::port_type::PortD>,
             decltype(cs1), decltype(cs2), decltype(e), decltype(rst)> graphic{};
