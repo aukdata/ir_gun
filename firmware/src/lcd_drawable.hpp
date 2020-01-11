@@ -16,7 +16,7 @@ namespace gb7
     {
     private:
         lcd<RS_Pin, RW_Pin, DataBus_Port, CS1_Pin, CS2_Pin, E_Pin, RST_Pin> graphical_lcd;
-        bool dirty[16][8] = { false };
+        bool dirty[8][16] = { false };
         uint8_t buffer[2][8][64] = { 0 };
 
     public:
@@ -29,18 +29,18 @@ namespace gb7
         {
             graphical_lcd.set_chip(true, true);
 
-            for (uint8_t chunk_y = 0; chunk_y < 8; chunk_y++)
+            for (uint8_t chunk_x = 0; chunk_x < 8; chunk_x++)
             {
-                graphical_lcd.set_page(chunk_y);
-                for (uint8_t chunk_x = 0; chunk_x < 8; chunk_x++)
+                graphical_lcd.set_page(chunk_x);
+                for (uint8_t chunk_y = 0; chunk_y < 8; chunk_y++)
                 {
-                    dirty[0 + chunk_x][chunk_y] = false;
-                    dirty[8 + chunk_x][chunk_y] = false;
+                    dirty[chunk_x][0 + chunk_y] = false;
+                    dirty[chunk_x][8 + chunk_y] = false;
                     for (uint8_t i = 0; i < 8; i++)
                     {
-                        const uint8_t column = chunk_x * 8 + i;
-                        buffer[0][chunk_y][column] = 0;
-                        buffer[1][chunk_y][column] = 0;
+                        const uint8_t column = chunk_y * 8 + i;
+                        buffer[0][chunk_x][column] = 0;
+                        buffer[1][chunk_x][column] = 0;
                         graphical_lcd.set_data(0);
                     }
                 }
@@ -49,66 +49,66 @@ namespace gb7
 
         inline void clear() noexcept
         {
-            for (uint8_t chunk_y = 0; chunk_y < 8; chunk_y++)
+            for (uint8_t chunk_x = 0; chunk_x < 8; chunk_x++)
             {
-                for (uint8_t chunk_x = 0; chunk_x < 8; chunk_x++)
+                for (uint8_t chunk_y = 0; chunk_y < 8; chunk_y++)
                 {
                     bool is_left_empty = true;
                     bool is_right_empty = true;
                     for (uint8_t i = 0; i < 8; i++)
                     {
-                        const uint8_t column = chunk_x * 8 + i;
-                        if (buffer[0][chunk_y][column] != 0)
+                        const uint8_t row = chunk_y * 8 + i;
+                        if (buffer[0][chunk_x][row] != 0)
                         {
-                            buffer[0][chunk_y][column] = 0;
+                            buffer[0][chunk_x][row] = 0;
                             is_left_empty = false;
                         }
-                        if (buffer[1][chunk_y][column] != 0)
+                        if (buffer[1][chunk_x][row] != 0)
                         {
-                            buffer[1][chunk_y][column] = 0;
+                            buffer[1][chunk_x][row] = 0;
                             is_right_empty = false;
                         }
                     }
                     if (!is_left_empty)
-                        dirty[0 + chunk_x][chunk_y] = true;
+                        dirty[chunk_x][0 + chunk_y] = true;
                     if (!is_right_empty)
-                        dirty[8 + chunk_x][chunk_y] = true;
+                        dirty[chunk_x][8 + chunk_y] = true;
                 }
             }
         }
 
         inline void set_pixel(uint8_t x, uint8_t y, bool value) noexcept
         {
-            if (x < 128 && y < 64)
+            if (x < 64 && y < 128)
             {
-                const uint8_t chip = x / 64;
-                const uint8_t page = y / 8;
-                const uint8_t column = x % 64;
-                const uint8_t mask = value ? 1 << (y % 8) : 0;
-                if (((buffer[chip][page][column] & mask) ^ mask) != 0)
+                const uint8_t chip = y / 64;
+                const uint8_t page = x / 8;
+                const uint8_t row = y % 64;
+                const uint8_t mask = value ? 1 << (x % 8) : 0;
+                if (((buffer[chip][page][row] & mask) ^ mask) != 0)
                 {
                     if (value)
                     {
-                        buffer[chip][page][column] |= mask;
+                        buffer[chip][page][row] |= mask;
                     }
                     else
                     {
-                        buffer[chip][page][column] &= ~mask;
+                        buffer[chip][page][row] &= ~mask;
                     }
-                    dirty[x / 8][page] = true;
+                    dirty[page][y / 8] = true;
                 }
             }
         }
 
         inline bool get_pixel(uint8_t x, uint8_t y) const noexcept
         {
-            if (x < 128 && y < 64)
+            if (y < 128 && x < 64)
             {
-                const uint8_t chip = x / 64;
-                const uint8_t page = y / 8;
-                const uint8_t column = x % 64;
-                const uint8_t mask = 1 << (y % 8);
-                return (buffer[chip][page][column] & mask) != 0;
+                const uint8_t chip = y / 64;
+                const uint8_t page = x / 8;
+                const uint8_t row = y % 64;
+                const uint8_t mask = 1 << (x % 8);
+                return (buffer[chip][page][row] & mask) != 0;
             }
             return false;
         }
@@ -154,7 +154,7 @@ namespace gb7
             {
                 buffer[column / 16][line][(column % 16) * 4 + i] = gb7::font::misaki_font_former[index][i];
             }
-            dirty[column / 2][line] = true;
+            dirty[line][column / 2] = true;
         }
 
         inline void draw_ascii_string(uint8_t line, uint8_t column, const char* s) noexcept
@@ -186,7 +186,7 @@ namespace gb7
             {
                 buffer[column / 8][line][(column % 8) * 8 + i] = (c >> 8 * (6 - i)) & 0xff;
             }
-            dirty[column][line] = true;
+            dirty[line][column] = true;
         }
 
         inline void draw_zenkaku_string(uint8_t line, uint8_t column, const uint64_t* str) noexcept
@@ -215,7 +215,7 @@ namespace gb7
                     graphical_lcd.set_page(chunk_y);
                     for (uint8_t chunk_x = 0; chunk_x < 8; chunk_x++)
                     {
-                        if (dirty[chip * 8 + chunk_x][chunk_y])
+                        if (dirty[chunk_y][chip * 8 + chunk_x])
                         {
                             for (uint8_t i = 0; i < 8; i++)
                             {
@@ -223,7 +223,7 @@ namespace gb7
                                 graphical_lcd.set_column(column);
                                 graphical_lcd.set_data(buffer[chip][chunk_y][column]);
                             }
-                            dirty[chip * 8 + chunk_x][chunk_y] = false;
+                            dirty[chunk_y][chip * 8 + chunk_x] = false;
                         }
                     }
                 }
