@@ -51,11 +51,20 @@ int main()
         auto e   = port_b.get_writable_pin<7>();
         auto rs  = port_c.get_writable_pin<5>();
 
+        auto ls  = port_c.get_readable_pin<2>();
+
         gb7::lcd_drawable<decltype(rs), decltype(rw), gb7::port_dyamic<gb7::port_type::PortD>,
             decltype(cs1), decltype(cs2), decltype(e), decltype(rst)> graphic{};
 
         graphic.draw_ascii_string(0, 5, "\xcf\xb2\xba\xdd Atmega328P\n with TG12864B-02WWBV");
-        graphic.update();
+
+        for (int i=0;; i++)
+        {
+            graphic.printf(3, 4, "Iteration: %d", i);
+            graphic.printf(4, 4, "Light detection: %d", static_cast<int>(!ls));
+            graphic.update();
+            _delay_ms(100);
+        }
     }
 
     /*
