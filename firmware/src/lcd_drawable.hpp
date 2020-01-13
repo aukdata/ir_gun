@@ -77,14 +77,14 @@ namespace gb7
             }
         }
 
-        inline void set_pixel(uint8_t x, uint8_t y, bool value) noexcept
+        inline void set_pixel(int x, int y, bool value) noexcept
         {
             if (x < 64 && y < 128)
             {
-                const uint8_t chip = y / 64;
-                const uint8_t page = x / 8;
-                const uint8_t row = y % 64;
-                const uint8_t mask = value ? 1 << (x % 8) : 0;
+                const int chip = y / 64;
+                const int page = x / 8;
+                const int row = y % 64;
+                const int mask = value ? 1 << (x % 8) : 0;
                 if (((buffer[chip][page][row] & mask) ^ mask) != 0)
                 {
                     if (value)
@@ -100,14 +100,14 @@ namespace gb7
             }
         }
 
-        inline bool get_pixel(uint8_t x, uint8_t y) const noexcept
+        inline bool get_pixel(int x, int y) const noexcept
         {
             if (y < 128 && x < 64)
             {
-                const uint8_t chip = y / 64;
-                const uint8_t page = x / 8;
-                const uint8_t row = y % 64;
-                const uint8_t mask = 1 << (x % 8);
+                const int chip = y / 64;
+                const int page = x / 8;
+                const int row = y % 64;
+                const int mask = 1 << (x % 8);
                 return (buffer[chip][page][row] & mask) != 0;
             }
             return false;
