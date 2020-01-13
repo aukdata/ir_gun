@@ -113,28 +113,68 @@ namespace gb7
             return false;
         }
 
-        inline void draw_line(uint8_t x, uint8_t y, uint8_t to_x, uint8_t to_y) noexcept
+        void draw_line(int x0, int y0, int x1, int y1) noexcept
         {
-            const uint8_t x_start = min(x, to_x);
-            const uint8_t x_end = max(x, to_x);
-            const uint8_t y_start = min(y, to_y);
-            const uint8_t y_end = max(y, to_y);
-
-            const uint16_t width = x_end - x_start;
-            const uint16_t height = y_end - y_start;
-
-            if (width > height)
+            const bool steep = abs(x1 - x0) < abs(y1 - y0);
+            if (steep)
             {
-                for (uint16_t i = 0; i < width; i++)
-                {
-                    set_pixel(x_start + i, y_start + i * height / width, true);
-                }
+                swap(x0, y0);
+                swap(x1, y1);
+            }
+
+            if (x0 > x1)
+            {
+                swap(x0, x1);
+                swap(y0, y1);
+            }
+
+            const int dx = x1 - x0;
+            const int dy = abs(y1 - y0);
+            const int dx2 = 2 * dx;
+            const int dy2 = 2 * dy;
+            const int increasing = y0 < y1;
+
+            int x = x0;
+            int y = y0;
+            int error = 0;
+
+            if (steep)
+            {
+                set_pixel(y0, x0, true);
             }
             else
             {
-                for (uint16_t i = 0; i < height; i++)
+                set_pixel(x0, y0, true);
+            }
+            
+            while (x < x1)
+            {
+                if (error + dy2 - dx > 0)
                 {
-                    set_pixel(x_start + i * width / height, y_start + i, true);
+                    if (increasing)
+                    {
+                        y++;
+                    }
+                    else
+                    {
+                        y--;
+                    }
+                    
+                    error += dy2 - dx2;
+                }
+                else
+                {
+                    error += dy2;
+                }
+                x++;
+
+                if (steep)
+                {
+                    set_pixel(y, x, true);
+                }
+                else
+                {
+                    set_pixel(x, y, true);
                 }
             }
         }
