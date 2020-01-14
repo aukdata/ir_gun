@@ -77,9 +77,14 @@ namespace gb7
             }
         }
 
+        constexpr bool is_position_inside(int x, int y) const
+        {
+            return 0 <= x && x < 64 && 0 <= y && y < 128;
+        }
+
         inline void set_pixel(int x, int y, bool value) noexcept
         {
-            if (x < 64 && y < 128)
+            if (is_position_inside(x, y))
             {
                 const int chip = y / 64;
                 const int page = x / 8;
@@ -102,7 +107,7 @@ namespace gb7
 
         inline bool get_pixel(int x, int y) const noexcept
         {
-            if (y < 128 && x < 64)
+            if (is_position_inside(x, y))
             {
                 const int chip = y / 64;
                 const int page = x / 8;
