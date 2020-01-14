@@ -60,8 +60,17 @@ int main()
 
         for (int i=0;; i++)
         {
+            graphic.clear();
+
             graphic.printf(3, 4, "Iteration: %d", i);
             graphic.printf(4, 4, "Light detection: %d", static_cast<int>(!ls));
+
+            graphic.draw_line(16, 128 - i % 128, 32, i % 128);
+
+            graphic.draw_circle(18, 20, i % 16);
+            graphic.draw_circle(120, 60, i % 5);
+            graphic.draw_circle(60, 40, i % 7);
+
             graphic.update();
             _delay_ms(100);
         }
