@@ -184,6 +184,108 @@ namespace gb7
             }
         }
 
+        void draw_circle(int x0, int y0, int x1, int y1) noexcept
+        {
+            const bool steep = abs(x1 - x0) < abs(y1 - y0);
+            if (steep)
+            {
+                swap(x0, y0);
+                swap(x1, y1);
+            }
+
+            if (x0 > x1)
+            {
+                swap(x0, x1);
+                swap(y0, y1);
+            }
+
+            const int dx = x1 - x0;
+            const int dy = abs(y1 - y0);
+            const int dx2 = 2 * dx;
+            const int dy2 = 2 * dy;
+            const int increasing = y0 < y1;
+
+            int x = x0;
+            int y = y0;
+            int error = 0;
+
+            if (steep)
+            {
+                set_pixel(y0, x0, true);
+            }
+            else
+            {
+                set_pixel(x0, y0, true);
+            }
+            
+            while (x < x1)
+            {
+                if (error + dy2 - dx > 0)
+                {
+                    if (increasing)
+                    {
+                        y++;
+                    }
+                    else
+                    {
+                        y--;
+                    }
+                    
+                    error += dy2 - dx2;
+                }
+                else
+                {
+                    error += dy2;
+                }
+                x++;
+
+                if (steep)
+                {
+                    set_pixel(y, x, true);
+                }
+                else
+                {
+                    set_pixel(x, y, true);
+                }
+            }
+        }
+
+        void draw_circle(int x0, int y0, int r) noexcept
+        {
+            int x = 0;
+            int y = 0 + r;
+            int error = 0;
+
+            set_pixel(x0 + r, y0    , true);
+            set_pixel(x0    , y0 + r, true);
+            set_pixel(x0 - r, y0    , true);
+            set_pixel(x0    , y0 - r, true);
+            
+            while (x < y)
+            {
+                if (error + 8*x - 4*y + 5 > 0)
+                {
+                    error += 8*x - 8*y + 8;
+                    y--;
+                }
+                else
+                {
+                    error += 8*x + 4;
+                }
+                x++;
+
+                set_pixel(x0 + x, y0 + y, true);
+                set_pixel(x0 + y, y0 + x, true);
+                set_pixel(x0 + y, y0 - x, true);
+                set_pixel(x0 + x, y0 - y, true);
+
+                set_pixel(x0 - x, y0 + y, true);
+                set_pixel(x0 - y, y0 + x, true);
+                set_pixel(x0 - y, y0 - x, true);
+                set_pixel(x0 - x, y0 - y, true);
+            }
+        }
+
         inline void draw_ascii_char(uint8_t line, uint8_t column, char c) noexcept
         {
             if (line > 8 || column > 32) return;
