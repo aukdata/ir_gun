@@ -7,10 +7,10 @@
 #include "queue.hpp"
 #include "utils.hpp"
 
-template<class Photo_Transister>
+template<class PhotoTransister>
 class light_sensor // consumes timer 2
 {
-    Photo_Transister pin;
+    PhotoTransister pin;
     uint16_t recieved_data = 0;
 
     static inline constexpr uint8_t prologue = 0b1011011;
@@ -30,7 +30,7 @@ public:
 
             if (static_cast<uint8_t>(buffer) == light_sensor::epologue && (buffer >> 24) == light_sensor::prologue)
             {
-                static_cast<light_sensor<Photo_Transister>*>(ls)->recieved_data = (buffer >> 8) && 0xffff;
+                static_cast<light_sensor<PhotoTransister>*>(ls)->recieved_data = (buffer >> 8) && 0xffff;
             }
         }, this);
     }
