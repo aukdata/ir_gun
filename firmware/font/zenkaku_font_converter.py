@@ -5,11 +5,13 @@ import numpy as np
 img = Image.open('misaki_png_2019-10-19/misaki_gothic_2nd.png')
 width, height = img.size
 
+print(img.size)
+
 # convert the image to ndarray of pixels
-img_pixels = np.array([[0 if img.getpixel((i,j)) != 0 else 1 for j in range(height)] for i in range(width)])
+img_pixels = np.array([[0 if img.getpixel((i,j)) != 0 else 1 for i in range(height)] for j in range(width)])
 
 # split pixels into 8x8
-fonts = [img_pixels[(x * 8):((x + 1) * 8), (y * 8):((y + 1) * 8)] for y in range(0, height // 8) for x in range(0, width // 8) ]
+fonts = [img_pixels[(x * 8):((x + 1) * 8), (y * 8):((y + 1) * 8)] for x in range(0, height // 8) for y in range(0, width // 8) ]
 
 # write file the converted font
 with open('misaki_gothic_2nd.py', mode='w', encoding='utf8') as f:
