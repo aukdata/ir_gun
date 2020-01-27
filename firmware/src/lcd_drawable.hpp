@@ -151,7 +151,7 @@ namespace gb7
             {
                 set_pixel(x0, y0, true);
             }
-            
+
             while (x < x1)
             {
                 if (error + dy2 - dx > 0)
@@ -164,7 +164,7 @@ namespace gb7
                     {
                         y--;
                     }
-                    
+
                     error += dy2 - dx2;
                 }
                 else
@@ -194,7 +194,7 @@ namespace gb7
             set_pixel(x0    , y0 + r, true);
             set_pixel(x0 - r, y0    , true);
             set_pixel(x0    , y0 - r, true);
-            
+
             while (x < y)
             {
                 if (error + 8*x - 4*y + 5 > 0)
@@ -220,59 +220,69 @@ namespace gb7
             }
         }
 
-        inline void draw_ascii_char(uint8_t line, uint8_t column, char c) noexcept
+        inline void draw_ascii_char(int line, int column, char c) noexcept
         {
-            if (line > 8 || column > 32) return;
+            if (line < 0 || 16 <= line || column < 0 || 16 <= column) return;
+            column = 15 - column;
 
-            uint8_t index;
-            if (static_cast<char>(32) < c && c <= static_cast<char>(127))
-                index = static_cast<int>(c) - 32;
-            else if (static_cast<char>(161) < c && c <= static_cast<char>(224))
-                index = static_cast<int>(c) - 161 + 96;
+            int index;
+            if (static_cast<char>(33) <= c && c <= static_cast<char>(126))
+                index = static_cast<int>(c) - 33;
+            else if (static_cast<char>(161) <= c && c <= static_cast<char>(223))
+                index = static_cast<int>(c) - 161 + 94;
             else return;
 
-            for (uint8_t i = 0; i < 3; i++)
+            for (int i = 0; i < 4; i++)
             {
-                buffer[column / 16][line][(column % 16) * 4 + i] = gb7::font::misaki_font_former[index][i];
+                if (column % 2 == 0)
+                {
+                    buffer[line / 8][column / 2][(line % 8) * 8 + 2 * i + 0] |= (gb7::font::misaki_font[index][i] & 0xf0) >> 4;
+                    buffer[line / 8][column / 2][(line % 8) * 8 + 2 * i + 1] |= (gb7::font::misaki_font[index][i] & 0x0f) >> 0;
+                }
+                else
+                {
+                    buffer[line / 8][column / 2][(line % 8) * 8 + 2 * i + 0] |= (gb7::font::misaki_font[index][i] & 0xf0) << 0;
+                    buffer[line / 8][column / 2][(line % 8) * 8 + 2 * i + 1] |= (gb7::font::misaki_font[index][i] & 0x0f) << 4;
+                }
             }
-            dirty[line][column / 2] = true;
+            dirty[column / 2][line] = true;
         }
 
-        inline void draw_ascii_string(uint8_t line, uint8_t column, const char* s) noexcept
+        inline void draw_ascii_string(int line, int column, const char* s) noexcept
         {
-            uint8_t temp_column = column;
+            int temp_column = column;
 
-            for (uint8_t i = 0; s[i] != 0x0000; i++)
+            for (int i = 0; s[i] != '\0'; i++)
             {
                 if (s[i] == '\n')
                 {
                     temp_column = column;
                     line++;
                 }
-                else if (temp_column < 32)
+                else if (temp_column < 16)
                 {
-                    
                     draw_ascii_char(line, temp_column, s[i]);
                     temp_column++;
                 }
             }
         }
 
-        inline void draw_zenkaku_char(uint8_t line, uint8_t column, uint64_t c) noexcept
+        inline void draw_zenkaku_char(int line, int column, uint64_t c) noexcept
         {
-            if (line > 8 || column > 16) return;
+            if (line < 0 || 16 <= line || column < 0 || 8 <= column) return;
             c--;
+            column = 7 - column;
 
             for (uint8_t i = 0; i < 7; i++)
             {
-                buffer[column / 8][line][(column % 8) * 8 + i] = (c >> 8 * (6 - i)) & 0xff;
+                buffer[line / 8][column][(line % 8) * 8 + i] = (c >> 8 * (6 - i)) & 0xff;
             }
-            dirty[line][column] = true;
+            dirty[column][line] = true;
         }
 
         inline void draw_zenkaku_string(uint8_t line, uint8_t column, const uint64_t* str) noexcept
         {
-            for (uint8_t i = 0; str[i] != 0 && (column + i) < 16; i++)
+            for (uint8_t i = 0; str[i] != 0 && (column + i) < 8; i++)
             {
                 draw_zenkaku_char(line, column + i, str[i]);
             }
@@ -281,8 +291,8 @@ namespace gb7
         template<typename... Args>
         inline void printf(uint8_t line, uint8_t column, const char* format, Args... args)
         {
-            char buf[33];
-            snprintf(buf, 33, format, args...);
+            char buf[65];
+            snprintf(buf, 65, format, args...);
             draw_ascii_string(line, column, buf);
         }
 
