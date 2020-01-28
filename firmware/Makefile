@@ -58,7 +58,7 @@ FUSES      = -U lfuse:w:0xc2:m -U hfuse:w:0xd9:m -U efuse:w:0xff:m
 AVRDUDE = avrdude $(PROGRAMMER) -p $(DEVICE)
 INCLUDE = ../../gb7avr/firmware/src
 LIBRARY = ../../gb7avr/firmware/build
-COMPILE = avr-g++ -std=c++2a -Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -fconcepts -I$(INCLUDE) -L$(LIBRARY)
+COMPILE = avr-g++ -std=c++2a -Wall -Wextra -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -fconcepts -I$(INCLUDE) -L$(LIBRARY)
 SIMULATE = simavr -f $(CLOCK) -m $(DEVICE)
 
 # symbolic targets:
