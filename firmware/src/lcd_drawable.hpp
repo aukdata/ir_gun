@@ -228,8 +228,6 @@ namespace gb7
             int index;
             if (static_cast<char>(33) <= c && c <= static_cast<char>(126))
                 index = static_cast<int>(c) - 33;
-            else if (static_cast<char>(161) <= c && c <= static_cast<char>(223))
-                index = static_cast<int>(c) - 161 + 94;
             else return;
 
             for (int i = 0; i < 4; i++)
