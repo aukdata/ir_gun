@@ -23,7 +23,7 @@ with open('misaki_gothic_2nd.py', mode='w', encoding='utf8') as f:
         for j, c in enumerate(font):
             h = 0x00;
             for k in range(0, 8):
-                h = h | c[7 - k] << (7 - k)
+                h = h | c[7 - k] << (k)
 
             if h != 0:
                 has_shape = True
