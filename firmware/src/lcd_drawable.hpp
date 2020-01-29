@@ -226,8 +226,10 @@ namespace gb7
             column = 15 - column;
 
             int index;
-            if (static_cast<char>(33) <= c && c <= static_cast<char>(126))
+            if (static_cast<char>(33) <= c && c <= static_cast<char>(90))
                 index = static_cast<int>(c) - 33;
+            else if (static_cast<char>(91) <= c && c <= static_cast<char>(126))
+                index = static_cast<int>(c) - 33 - 'a' + 'A';
             else return;
 
             for (int i = 0; i < 4; i++)
