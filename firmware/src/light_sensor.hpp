@@ -14,6 +14,7 @@ namespace gb7
     {
         PhotoTransister pin;
         uint16_t recieved_data = 0;
+        bool is_recieved = false;
         uint32_t timer_id = 0;
 
         uint32_t data = 0;
@@ -36,7 +37,6 @@ namespace gb7
                 if (static_cast<uint8_t>(static_cast<decltype(this)>(ls)->data >> 24) == static_cast<decltype(this)>(ls)->prologue &&
                     static_cast<uint8_t>(static_cast<decltype(this)>(ls)->data >> 0 ) == static_cast<decltype(this)>(ls)->epilogue)
                 {
-                PORTC |= 0b10000;
                     uint16_t shifted = static_cast<uint16_t>(static_cast<decltype(this)>(ls)->data >> 8);
                     static_cast<decltype(this)>(ls)->recieved_data =
                         (shifted & (1 << 0 )) >> 0 |
@@ -47,6 +47,11 @@ namespace gb7
                         (shifted & (1 << 10)) >> 5 |
                         (shifted & (1 << 12)) >> 6 |
                         (shifted & (1 << 14)) >> 7;
+                    static_cast<decltype(this)>(ls)->is_recieved = true;
+                }
+                else
+                {
+                    static_cast<decltype(this)>(ls)->is_recieved = false;
                 }
             }, this);
         }
@@ -57,12 +62,15 @@ namespace gb7
 
         uint8_t get_recieved_data()
         {
-            return recieved_data;
+            auto temp = recieved_data;
+            recieved_data = 0;
+            is_recieved = false;
+            return temp;
         }
 
-        uint32_t get_raw_data()
+        bool has_recieved_data() const
         {
-            return data;
+            return is_recieved;
         }
     };
 } // namespace gb7
