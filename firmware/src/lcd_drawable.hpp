@@ -84,6 +84,7 @@ namespace gb7
 
         inline void set_pixel(int x, int y, bool value) noexcept
         {
+            x = 64 - x;
             if (is_position_inside(x, y))
             {
                 const int chip = y / 64;
