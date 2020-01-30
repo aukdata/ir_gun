@@ -60,17 +60,19 @@ namespace gb7
             gb7::timer::multitimer::cancel_invocation(timer_id);
         }
 
-        uint8_t get_recieved_data()
-        {
-            auto temp = recieved_data;
-            recieved_data = 0;
-            is_recieved = false;
-            return temp;
-        }
-
         bool has_recieved_data() const
         {
             return is_recieved;
+        }
+        uint8_t get_recieved_data()
+        {
+            return recieved_data;
+        }
+
+        void pop_recieved_data()
+        {
+            is_recieved = false;
+            recieved_data = 0;
         }
     };
 } // namespace gb7
