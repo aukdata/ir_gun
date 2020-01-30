@@ -4,8 +4,6 @@
 #define GB7_TIMER_USE_INVOKE
 
 #include "timer.hpp"
-#include "queue.hpp"
-#include "utils.hpp"
 
 namespace gb7
 {
